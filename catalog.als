@@ -65,6 +65,26 @@ fact TodoMaterialTemMoeda {
 	all m:Material | some m.~material
 }
 
+----------------------- FUNCTIONS ------------------------
+
+fun temMoedas[c:Catalogo]: set Moeda {
+	c.moedas
+}
+
+----------------------- ASSERTS --------------------------
+
+-- O catálogo pode ter várias ou nenhuma moeda
+assert testeCatalogoComMoedas {
+	all c:Catalogo | #temMoedas[c] >= 0
+}
+
+-- Toda moeda deve estar associada ao catálogo
+assert testeMoedaPertenceACatalogo {
+	all m:Moeda | #(m.~moedas) > 0
+}
+
+check testeCatalogoComMoedas
+check testeMoedaPertenceACatalogo
 
 pred show[]{}
 run show
