@@ -37,12 +37,12 @@ fact MoedaVendidaOuNaoVendida {
 
 -- Cada moeda deve estar associada ao catálogo
 fact TodaMoedaNoCatalogo {
-	all m:Moeda | some m.~moedas
+	all m:Moeda | estaNoCatalogo[m]
 }
 
 -- Cada país deve estar associado a pelo menos uma moeda
 fact TodoPaisTemMoeda {
-	all p:Pais | some p.~pais
+	all p:Pais | associadoComMoeda[p]
 }
 
 -- Cada valor deve estar associado a uma moeda seja por compra ou mercado
@@ -52,34 +52,83 @@ fact TodoValorTemMoeda {
 
 -- Cada ano deve estar associado a pelo menos uma moeda
 fact TodoAnoTemMoeda {
-	all a:Ano | some a.~ano
+	all a:Ano | associadoComMoeda[a]
 }
 
 -- Cada estado deve estar associado a pelo menos uma moeda
 fact TodoEstadoTemMoeda {
-	all e:Estado | some e.~estado
+	all e:Estado | associadoComMoeda[e]
 }
 
 -- Cada material deve estar associado a pelo menos uma moeda
 fact TodoMaterialTemMoeda {
-	all m:Material | some m.~material
+	all m:Material | associadoComMoeda[m]
 }
 
 ----------------------- PREDS --------------------------
 
+pred estaNoCatalogo[m:Moeda] {
+	some moedasNoCatalogo[m]
+}
+
+pred associadoComMoeda[p:Pais] {
+	some paisesDasMoedas[p]
+}
+
 pred associadoComMoeda[v:Valor] {
-	some v.~valor_compra || some v.~valor_mercado
+	some valoresDeCompraDasMoedas[v] || some valoresDeMercadoDasMoedas[v]
+}
+
+pred associadoComMoeda[a:Ano] {
+	some anosDasMoedas[a]
+}
+
+pred associadoComMoeda[e:Estado] {
+	some estadosDasMoedas[e]
+}
+
+pred associadoComMoeda[m:Material] {
+	some materiaisDasMoedas[m]
 }
 
 ----------------------- FUNCTIONS ------------------------
+
+fun moedasNoCatalogo[m:Moeda]: set Catalogo {
+	moedas.m
+}
+
+fun paisesDasMoedas[p:Pais]: set Moeda {
+	pais.p
+}
+
+fun valoresDeCompraDasMoedas[v:Valor]: set Moeda {
+	valor_compra.v
+}
+
+fun valoresDeMercadoDasMoedas[v:Valor]: set Moeda {
+	valor_mercado.v
+}
+
+fun anosDasMoedas[a:Ano]: set Moeda {
+	ano.a
+}
+
+fun estadosDasMoedas[e:Estado]: set Moeda {
+	estado.e
+}
+
+fun materiaisDasMoedas[m:Material]: set Moeda {
+	material.m
+}
 
 fun temMoedas[c:Catalogo]: set Moeda {
 	c.moedas
 }
 
+
 ----------------------- ASSERTS --------------------------
 
--- O catálogo pode ter várias ou nenhuma moeda
+-- O catálogo pode ter várias moedas
 assert testeCatalogoComMoedas {
 	all c:Catalogo | #temMoedas[c] >= 0
 }
@@ -89,8 +138,14 @@ assert testeMoedaPertenceACatalogo {
 	all m:Moeda | #(m.~moedas) > 0
 }
 
+-- Se existe um material, então deve estar associado a uma moeda
+assert testeMaterialPertenceAMoeda {
+	all m:Material | #(m.~material) > 0 
+}
+
 check testeCatalogoComMoedas
 check testeMoedaPertenceACatalogo
+check testeMaterialPertenceAMoeda
 
 pred show[]{}
 run show
