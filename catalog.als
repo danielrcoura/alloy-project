@@ -47,7 +47,7 @@ fact TodoPaisTemMoeda {
 
 -- Cada valor deve estar associado a uma moeda seja por compra ou mercado
 fact TodoValorTemMoeda {
-	all v:Valor | some v.~valor_compra || some v.~valor_mercado
+	all v:Valor | associadoComMoeda[v]
 }
 
 -- Cada ano deve estar associado a pelo menos uma moeda
@@ -63,6 +63,12 @@ fact TodoEstadoTemMoeda {
 -- Cada material deve estar associado a pelo menos uma moeda
 fact TodoMaterialTemMoeda {
 	all m:Material | some m.~material
+}
+
+----------------------- PREDS --------------------------
+
+pred associadoComMoeda[v:Valor] {
+	some v.~valor_compra || some v.~valor_mercado
 }
 
 ----------------------- FUNCTIONS ------------------------
